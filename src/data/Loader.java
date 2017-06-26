@@ -47,4 +47,39 @@ public class Loader {
 			return null;
 		}
 	}
+
+	public ObservableList<Song> loadData(String url) throws IOException {
+		Document site = Jsoup.connect(url).get();
+
+		ObservableList<Song> list = FXCollections.observableArrayList();
+
+		Elements elelemts = site.select("h1");
+
+		if (elelemts != null) {
+			for (Element currentElement : elelemts) {
+				String href = currentElement.toString();
+				if (href.contains(".mp3")) {
+
+					Song song = new Song();
+
+					String[] allElementsInHref = href.split("\"");
+					String[] arrayWithTitleName = allElementsInHref[12].split(">");
+					arrayWithTitleName = arrayWithTitleName[1].split("<");
+					String clearedName = arrayWithTitleName[0].replaceAll("\\(", "");
+					clearedName = clearedName.replaceAll("\\)", "");
+					clearedName = clearedName.replaceAll(" ", "_");
+					clearedName = clearedName.replaceAll("'", "");
+
+					song.setName(clearedName);
+					song.setUrl("http://holychords.com" + allElementsInHref[1]);
+					song.setInterpreter("TODO");
+
+					list.add(song);
+				}
+			}
+			return list;
+		} else {
+			return null;
+		}
+	}
 }

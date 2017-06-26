@@ -1,14 +1,13 @@
 package main;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.net.URI;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+
+import org.apache.commons.io.FileUtils;
 
 import action.ChooseFolderAction;
+import action.LoadDataFromURLAction;
 import bo.Song;
 import data.Loader;
 import javafx.application.Application;
@@ -81,14 +80,28 @@ public class Start extends Application {
 		hBoxButton.getChildren().add(buttonChooseFolder);
 		commonGrid.add(hBoxButton, 2, 1);
 
-		commonGrid.add(messageField, 0, 2);
-
 		buttonChooseFolder.setOnAction(new ChooseFolderAction(fieldDownloadFolder, primaryStage));
+
+		Label labelURL = new Label("URL:");
+		commonGrid.add(labelURL, 0, 2);
+
+		TextField fieldURL = new TextField();
+		commonGrid.add(fieldURL, 1, 2);
+
+		Button buttonLoad = new Button("Load");
+		HBox hBoxButtonLoad = new HBox(10);
+		hBoxButtonLoad.setAlignment(Pos.BOTTOM_RIGHT);
+		hBoxButtonLoad.getChildren().add(buttonLoad);
+		commonGrid.add(hBoxButtonLoad, 2, 2);
+
+		buttonLoad.setOnAction(new LoadDataFromURLAction(fieldURL, songs, commonTable));
 
 		commonTable.setEditable(false);
 
-		TableColumn<Song, String> colInterpreter = new TableColumn<>("Interpreter");
-		colInterpreter.setCellValueFactory(new PropertyValueFactory<Song, String>("interpreter"));
+		// TableColumn<Song, String> colInterpreter = new
+		// TableColumn<>("Interpreter");
+		// colInterpreter.setCellValueFactory(new PropertyValueFactory<Song,
+		// String>("interpreter"));
 
 		TableColumn<Song, String> colName = new TableColumn<>("Name");
 		colName.setCellValueFactory(new PropertyValueFactory<Song, String>("name"));
@@ -118,7 +131,7 @@ public class Start extends Application {
 
 										String name = song.getName() + ".mp3";
 
-										download(song.getUrl(), fieldDownloadFolder.getText(), name);
+										download(song.getUrl(), fieldDownloadFolder.getText(), name, messageField);
 									});
 									setGraphic(buttonDownload);
 									setText(null);
@@ -133,7 +146,7 @@ public class Start extends Application {
 
 		commonTable.setItems(songs);
 
-		commonTable.getColumns().addAll(colInterpreter, colName, colAction);
+		commonTable.getColumns().addAll(colName, colAction);
 
 		Label tableLabel = new Label("Files:");
 		tableLabel.setFont(new Font("Arial", 14));
@@ -151,26 +164,27 @@ public class Start extends Application {
 		hBoxButtonDownloadAll.getChildren().add(buttonDownloadAll);
 		commonGrid.add(hBoxButtonDownloadAll, 0, 4);
 
+		commonGrid.add(messageField, 0, 5);
+
 		primaryStage.setScene(commonScene);
 		primaryStage.show();
 	}
 
-	private void download(String url, String path, String name) {
-		try {
+	private void download(String url, String path, String name, Text text) {
+		Runnable runnable = new Runnable() {
 
-			URL website = new URL(url);
-			try (InputStream in = website.openStream()) {
-				Files.copy(in, Paths.get(new URI(path + "/" + name)), StandardCopyOption.REPLACE_EXISTING);
+			@Override
+			public void run() {
+				try {
+					text.setText("Download...");
+					FileUtils.copyURLToFile(new URL(url), new File(path + File.pathSeparator + name));
+					text.setText("Saved in " + path + File.pathSeparator + name);
+				} catch (IOException e) {
+					e.printStackTrace();
+				}
 			}
-
-			// URL website = new URL(url);
-			// ReadableByteChannel rbc =
-			// Channels.newChannel(website.openStream());
-			// FileOutputStream fos = new FileOutputStream(path + "/" + name);
-			// fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
-		} catch (Throwable e) {
-			e.printStackTrace();
-		}
-
+		};
+		
+		runnable.run();
 	}
 }
