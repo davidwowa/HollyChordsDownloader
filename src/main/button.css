@@ -1,0 +1,15 @@
+.button_choose_folder {
+	-fx-background-color: #4CAF50; /* Green */
+}
+
+.button_load_url {
+	-fx-background-color: #abafaa;
+}
+
+.button_download {
+	-fx-background-color: #aaaf8a;
+}
+
+.button_download_all {
+	-fx-background-color: #94afad;
+}

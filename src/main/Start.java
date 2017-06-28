@@ -5,12 +5,15 @@ import java.io.IOException;
 import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import action.ChooseFolderAction;
 import action.LoadDataFromURLAction;
 import bo.Song;
 import data.Loader;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
@@ -24,7 +27,6 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
@@ -34,11 +36,14 @@ import javafx.util.Callback;
 
 public class Start extends Application {
 
+	private static Logger logger = LoggerFactory.getLogger(Start.class);
+
 	private ObservableList<Song> songs;
 	private TableView<Song> commonTable = new TableView<>(songs);
 	private Text messageField = new Text();
 
 	public static void main(String[] args) {
+		logger.info("start");
 		launch(args);
 	}
 
@@ -62,7 +67,10 @@ public class Start extends Application {
 		commonGrid.setVgap(10);
 		commonGrid.setPadding(new Insets(25, 25, 25, 25));
 
-		Scene commonScene = new Scene(commonGrid, 700, 700);
+		Scene commonScene = new Scene(commonGrid, 1000, 700);
+
+		// commonScene.getStylesheets().add("resources/css/button.css");
+		commonScene.getStylesheets().add(Start.class.getResource("button.css").toExternalForm());
 
 		Text scenetitle = new Text("Welcome to HolyChords Downloader v.0.1");
 		scenetitle.setFont(Font.font("Tahoma", FontWeight.NORMAL, 20));
@@ -75,10 +83,8 @@ public class Start extends Application {
 		commonGrid.add(fieldDownloadFolder, 1, 1);
 
 		Button buttonChooseFolder = new Button("Choose Folder");
-		HBox hBoxButton = new HBox(10);
-		hBoxButton.setAlignment(Pos.BOTTOM_RIGHT);
-		hBoxButton.getChildren().add(buttonChooseFolder);
-		commonGrid.add(hBoxButton, 2, 1);
+		buttonChooseFolder.getStyleClass().add("button_choose_folder");
+		commonGrid.add(buttonChooseFolder, 2, 1);
 
 		buttonChooseFolder.setOnAction(new ChooseFolderAction(fieldDownloadFolder, primaryStage));
 
@@ -89,10 +95,8 @@ public class Start extends Application {
 		commonGrid.add(fieldURL, 1, 2);
 
 		Button buttonLoad = new Button("Load");
-		HBox hBoxButtonLoad = new HBox(10);
-		hBoxButtonLoad.setAlignment(Pos.BOTTOM_RIGHT);
-		hBoxButtonLoad.getChildren().add(buttonLoad);
-		commonGrid.add(hBoxButtonLoad, 2, 2);
+		buttonLoad.getStyleClass().add("button_load_url");
+		commonGrid.add(buttonLoad, 2, 2);
 
 		buttonLoad.setOnAction(new LoadDataFromURLAction(fieldURL, songs, commonTable));
 
@@ -125,6 +129,7 @@ public class Start extends Application {
 									setGraphic(null);
 									setText(null);
 								} else {
+									buttonDownload.getStyleClass().add("button_download");
 									buttonDownload.setOnAction((ActionEvent event) -> {
 										Song song = getTableView().getItems().get(getIndex());
 										System.out.println(song.getUrl() + "   " + song.getName());
@@ -159,10 +164,8 @@ public class Start extends Application {
 		commonGrid.add(tableVBox, 0, 3, 3, 1);
 
 		Button buttonDownloadAll = new Button("Download All Songs");
-		HBox hBoxButtonDownloadAll = new HBox(10);
-		hBoxButtonDownloadAll.setAlignment(Pos.BOTTOM_RIGHT);
-		hBoxButtonDownloadAll.getChildren().add(buttonDownloadAll);
-		commonGrid.add(hBoxButtonDownloadAll, 0, 4);
+		buttonDownloadAll.getStyleClass().add("button_download_all");
+		commonGrid.add(buttonDownloadAll, 0, 4);
 
 		commonGrid.add(messageField, 0, 5);
 
@@ -171,20 +174,19 @@ public class Start extends Application {
 	}
 
 	private void download(String url, String path, String name, Text text) {
+		String fileName = path + File.separator + name;
 		Runnable runnable = new Runnable() {
-
 			@Override
 			public void run() {
 				try {
-					text.setText("Download...");
-					FileUtils.copyURLToFile(new URL(url), new File(path + File.pathSeparator + name));
-					text.setText("Saved in " + path + File.pathSeparator + name);
+					text.setText("Download " + fileName);
+					FileUtils.copyURLToFile(new URL(url), new File(fileName));
+					text.setText("Saved in " + fileName);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
 			}
 		};
-		
-		runnable.run();
+		Platform.runLater(runnable);
 	}
 }
