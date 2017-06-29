@@ -1,0 +1,36 @@
+2017-06-30 01:51:04 INFO  Start:48 - start app holy chords
+2017-06-30 01:51:04 DEBUG Start:54 - init app
+2017-06-30 01:51:04 DEBUG Loader:27 - load all data from holy chords
+2017-06-30 01:51:05 DEBUG Loader:35 - parsing HTML...
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Ты_омой_меня
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Давай_славить
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Я_хочу_на_Тебя_быть_похожим,_Иисус
+2017-06-30 01:51:05 DEBUG Loader:60 - found song О_Господь_в_молитве
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Господом_живи,_душа_моя
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Встань_с_верой
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Я_слагаю_болезни
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Воскресіння_День
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Доверять_Тебе
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Trust_In_You
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Я_пройду_с_тобой
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Только_один_Ты
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Bless_His_Name
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Отец_Сын_Дух_Святой
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Добрый_Добрый_Отец
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Только_Ты
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Доверять_Тебе
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Твой_крест
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Пусть_звучит_хвала
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Starlight
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Starlight
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Созданные_друг_для_друга
+2017-06-30 01:51:05 DEBUG Loader:60 - found song The_war_is_over
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Велика_любов_Твоя
+2017-06-30 01:51:05 DEBUG Loader:60 - found song All_things_are_possible
+2017-06-30 01:51:05 DEBUG Loader:60 - found song С_Богом_возможно_всё
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Even_When_It_Hurts_Praise_Song
+2017-06-30 01:51:05 DEBUG Loader:60 - found song Captain
+2017-06-30 01:51:05 DEBUG Loader:60 - found song За_грешных_нас
+2017-06-30 01:51:05 DEBUG Start:69 - init UI
+2017-06-30 01:51:05 DEBUG ChooseFolderAction:23 - create choose folder action
+2017-06-30 01:51:05 DEBUG LoadDataFromURLAction:26 - create load data from URL action
