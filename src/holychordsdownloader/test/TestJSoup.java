@@ -1,4 +1,4 @@
-package test;
+package holychordsdownloader.test;
 
 import java.io.IOException;
 

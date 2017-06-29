@@ -1,21 +1,18 @@
-package main;
+package holychordsdownloader.main;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 
-import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import action.ChooseFolderAction;
-import action.LoadDataFromURLAction;
-import bo.Song;
-import data.Loader;
+import holychordsdownloader.action.ChooseFolderAction;
+import holychordsdownloader.action.LoadDataFromURLAction;
+import holychordsdownloader.bo.Song;
+import holychordsdownloader.data.Loader;
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -28,6 +25,9 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaPlayer.Status;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
@@ -42,23 +42,32 @@ public class Start extends Application {
 	private TableView<Song> commonTable = new TableView<>(songs);
 	private Text messageField = new Text();
 
+	private Loader loader = new Loader();
+
 	public static void main(String[] args) {
-		logger.info("start");
+		logger.info("start app holy chords");
 		launch(args);
 	}
 
 	private void initData() {
-		Loader loader = new Loader();
+		if (logger.isDebugEnabled()) {
+			logger.debug("init app");
+		}
 		try {
 			songs = loader.loadData();
 		} catch (IOException e) {
-			e.printStackTrace();
+			if (logger.isErrorEnabled()) {
+				logger.error("error on data loading ", e);
+			}
 		}
 	}
 
 	@Override
 	public void start(Stage primaryStage) {
 		initData();
+		if (logger.isDebugEnabled()) {
+			logger.debug("init UI");
+		}
 		primaryStage.setTitle("HolyChords Downloader v.0.1");
 
 		GridPane commonGrid = new GridPane();
@@ -67,7 +76,7 @@ public class Start extends Application {
 		commonGrid.setVgap(10);
 		commonGrid.setPadding(new Insets(25, 25, 25, 25));
 
-		Scene commonScene = new Scene(commonGrid, 1000, 700);
+		Scene commonScene = new Scene(commonGrid, 600, 600);
 
 		// commonScene.getStylesheets().add("resources/css/button.css");
 		commonScene.getStylesheets().add(Start.class.getResource("button.css").toExternalForm());
@@ -132,11 +141,11 @@ public class Start extends Application {
 									buttonDownload.getStyleClass().add("button_download");
 									buttonDownload.setOnAction((ActionEvent event) -> {
 										Song song = getTableView().getItems().get(getIndex());
-										System.out.println(song.getUrl() + "   " + song.getName());
 
 										String name = song.getName() + ".mp3";
-
-										download(song.getUrl(), fieldDownloadFolder.getText(), name, messageField);
+										messageField.setText("download : " + name);
+										loader.download(song.getUrl(), fieldDownloadFolder.getText(), name,
+												messageField);
 									});
 									setGraphic(buttonDownload);
 									setText(null);
@@ -149,9 +158,65 @@ public class Start extends Application {
 
 		colAction.setCellFactory(cellFactory);
 
+		TableColumn<Song, String> colPlay = new TableColumn<>("Play");
+		// https://stackoverflow.com/questions/29489366/how-to-add-button-in-javafx-table-view
+		colPlay.setCellValueFactory(new PropertyValueFactory<>("DUMMY2"));
+
+		Callback<TableColumn<Song, String>, TableCell<Song, String>> cellFactoryPlay = //
+				new Callback<TableColumn<Song, String>, TableCell<Song, String>>() {
+					@Override
+					public TableCell call(final TableColumn<Song, String> param) {
+						final TableCell<Song, String> cell = new TableCell<Song, String>() {
+							Media pik;
+							MediaPlayer mediaPlayer;
+
+							@Override
+							public void updateItem(String item, boolean empty) {
+								super.updateItem(item, empty);
+								if (empty) {
+									setGraphic(null);
+									setText(null);
+								} else {
+
+									Button playButton = new Button("Play");
+									playButton.setOnAction(new EventHandler<ActionEvent>() {
+
+										@Override
+										public void handle(ActionEvent event) {
+											Song song = getTableView().getItems().get(getIndex());
+
+											if (pik == null && mediaPlayer == null) {
+												pik = new Media(song.getUrl());
+												mediaPlayer = new MediaPlayer(pik);
+											}
+
+											if (Status.PLAYING != mediaPlayer.getStatus()) {
+												if (logger.isDebugEnabled()) {
+													logger.debug("playing " + song.getUrl());
+												}
+												messageField.setText("playing : " + song.getName());
+												playButton.setText("Stop");
+												mediaPlayer.play();
+											} else {
+												playButton.setText("Play");
+												mediaPlayer.stop();
+											}
+										}
+									});
+									setGraphic(playButton);
+									setText(null);
+								}
+							}
+						};
+						return cell;
+					}
+				};
+
+		colPlay.setCellFactory(cellFactoryPlay);
+
 		commonTable.setItems(songs);
 
-		commonTable.getColumns().addAll(colName, colAction);
+		commonTable.getColumns().addAll(colName, colAction, colPlay);
 
 		Label tableLabel = new Label("Files:");
 		tableLabel.setFont(new Font("Arial", 14));
@@ -171,22 +236,5 @@ public class Start extends Application {
 
 		primaryStage.setScene(commonScene);
 		primaryStage.show();
-	}
-
-	private void download(String url, String path, String name, Text text) {
-		String fileName = path + File.separator + name;
-		Runnable runnable = new Runnable() {
-			@Override
-			public void run() {
-				try {
-					text.setText("Download " + fileName);
-					FileUtils.copyURLToFile(new URL(url), new File(fileName));
-					text.setText("Saved in " + fileName);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		};
-		Platform.runLater(runnable);
 	}
 }

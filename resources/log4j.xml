@@ -29,14 +29,14 @@
 	</appender>
 
 	<logger name="HolyChordsDownloader" additivity="false">
-		<level value="INFO" />
+		<level value="DEBUG" />
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="STDERR" />
 	</logger>
 
 	<!-- root logger -->
 	<root>
-		<level value="INFO" />
+		<level value="DEBUG" />
 		<appender-ref ref="STDOUT" />
 		<appender-ref ref="file" />
 	</root>

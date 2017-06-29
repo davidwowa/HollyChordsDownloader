@@ -1,4 +1,4 @@
-package bo;
+package holychordsdownloader.bo;
 
 public class Song {
 
